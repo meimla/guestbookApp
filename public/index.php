@@ -16,3 +16,5 @@
     dump($array);
 
     echo $array[1] . $array[2];
+
+    echo "Test";
