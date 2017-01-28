@@ -2,9 +2,13 @@
 
     require_once '/home/vagrant/Code/guestbook/vendor/autoload.php';
 
+    $file = '../storage/database.db';
+    if (is_writable('../storage/database.local.db')) {
+        $file = '../storage/database.local.db';
+    }
     $database = new medoo([
         'database_type' => 'sqlite',
-        'database_file' => '../storage/database.db'
+        'database_file' => $file
     ]);
 
     $comment = new SitePoint\Comment($database);
@@ -12,7 +16,7 @@
         ->setName('Mihkel Test')
         ->setComment('Hooray! Saving comments works!')
         ->save();
-    dump($database->error());
+
 
 ?>
 <!doctype html>
