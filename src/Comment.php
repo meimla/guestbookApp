@@ -21,7 +21,7 @@ class Comment
         $collection = [];
         $comments = $this->database->select('comments', '*',
             ["ORDER" => "comments.submissionDate DESC"]);
-        if ($comments){
+        if ($comments) {
             foreach ($comments as $array) {
                 $comment = new self($this->database);
                 $collection[] = $comment
@@ -67,6 +67,8 @@ class Comment
     protected function setSubmissionDate($date)
     {
         $this->submissionDate = $date;
+
+        return $this;
     }
 
     public function getName()

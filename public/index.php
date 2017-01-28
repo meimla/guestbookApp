@@ -1,5 +1,6 @@
 <?php
 
+    use Particle\Validator\Validator;
     require_once '/home/vagrant/Code/guestbook/vendor/autoload.php';
 
     $file = '../storage/database.db';
@@ -12,11 +13,33 @@
     ]);
 
     $comment = new SitePoint\Comment($database);
-    $comment->setEmail('mihkel@test.ee')
-        ->setName('Mihkel Test')
-        ->setComment('Hooray! Saving comments works!')
-        ->save();
 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $v = new Validator();
+        $v->required('name')->lengthBetween(1, 100)->alnum(true);
+        $v->required('email')->email()->lengthBetween(5, 255);
+        $v->required('comment')->lengthBetween(10, null);
+
+        $result = $v->validate($_POST);
+
+        if ($result->isValid()) {
+            try {
+                $comment
+                    ->setName($_POST['name'])
+                    ->setEmail($_POST['email'])
+                    ->setComment($_POST['comment'])
+                    ->save();
+                header('Location: /');
+                return;
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
+        } else {
+            dump($result->getMessages());
+        }
+
+
+    }
 
 ?>
 <!doctype html>
@@ -33,6 +56,7 @@
 
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/custom.css">
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
     </head>
     <body>
@@ -41,6 +65,12 @@
         <![endif]-->
 
         <!-- Add your site or application content here -->
+        <?php foreach ($comment->findAll() as $comment) : ?>
+            <div class="comment">
+                <h3>On <?= $comment->getSubmissionDate() ?>, <?= $comment->getName() ?> wrote:</h3>
+                <p><?= $comment->getComment(); ?></p>
+            </div>
+        <?php endforeach; ?>
         <form method="post">
             <label>Name: <input type="text" name="name" placeholder="Your Name"></label>
             <label>Email: <input type="text" name="email" placeholder="your@email.com"></label>
