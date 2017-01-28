@@ -7,6 +7,13 @@
         'database_file' => '../storage/database.db'
     ]);
 
+    $comment = new SitePoint\Comment($database);
+    $comment->setEmail('mihkel@test.ee')
+        ->setName('Mihkel Test')
+        ->setComment('Hooray! Saving comments works!')
+        ->save();
+    dump($database->error());
+
 ?>
 <!doctype html>
 <html class="no-js" lang="">
